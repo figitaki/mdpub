@@ -43,4 +43,5 @@ COPY --from=build /app/_build/prod/rel/mdpub ./
 
 EXPOSE 4000
 
-CMD ["/app/bin/mdpub", "start"]
+# Use foreground so the release stays attached as PID 1 in containers
+CMD ["/app/bin/mdpub", "foreground"]
