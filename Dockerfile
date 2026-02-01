@@ -37,11 +37,12 @@ ENV MIX_ENV=prod \
     LANG=C.UTF-8 \
     PORT=4000 \
     MDPUB_CONTENT_DIR=/app/content \
-    MDPUB_WATCH=false
+    MDPUB_WATCH=false \
+    RELEASE_DISTRIBUTION=none
 
 COPY --from=build /app/_build/prod/rel/mdpub ./
 
 EXPOSE 4000
 
-# Use foreground so the release stays attached as PID 1 in containers
-CMD ["/app/bin/mdpub", "foreground"]
+# "start" runs in the foreground; "daemon" would background itself.
+CMD ["/app/bin/mdpub", "start"]
