@@ -32,6 +32,8 @@ defmodule Mdpub.PageLayout do
   end
 
   defp page(title, body_html) do
+    base = base_path()
+
     """
     <!doctype html>
     <html lang=\"en\">
@@ -39,12 +41,13 @@ defmodule Mdpub.PageLayout do
         <meta charset=\"utf-8\" />
         <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" />
         <title>#{escape(title)} · #{@app_name}</title>
-        <link rel=\"stylesheet\" href=\"/assets/style.css\" />
+        <base href=\"#{escape(base)}/\" />
+        <link rel=\"stylesheet\" href=\"#{escape(base)}/assets/style.css\" />
       </head>
       <body>
         <header class=\"top\">
           <div class=\"container\">
-            <a class=\"brand\" href=\"/\">#{@app_name}</a>
+            <a class=\"brand\" href=\"#{escape(base)}/\">#{@app_name}</a>
           </div>
         </header>
 
@@ -60,6 +63,12 @@ defmodule Mdpub.PageLayout do
       </body>
     </html>
     """
+  end
+
+  defp base_path do
+    System.get_env("MDPUB_BASE_PATH", "")
+    |> String.trim()
+    |> String.trim_trailing("/")
   end
 
   # minimal HTML escape

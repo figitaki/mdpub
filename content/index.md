@@ -8,7 +8,7 @@ A tiny Markdown publisher written in Elixir.
 
 ## Try it
 
-- [/getting-started](/getting-started)
-- [/docs/routing](/docs/routing)
+- [getting-started](getting-started)
+- [docs/routing](docs/routing)
 
 > Tip: edit files under `content/` and refresh.
