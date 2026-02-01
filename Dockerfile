@@ -41,6 +41,8 @@ ENV MIX_ENV=prod \
     RELEASE_DISTRIBUTION=none
 
 COPY --from=build /app/_build/prod/rel/mdpub ./
+# Include demo content in the runtime image
+COPY --from=build /app/content ./content
 
 EXPOSE 4000
 
