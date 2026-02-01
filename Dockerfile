@@ -10,7 +10,7 @@ WORKDIR /app
 ENV MIX_ENV=prod
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
-    build-essential git \
+    build-essential git nodejs npm \
   && rm -rf /var/lib/apt/lists/*
 
 RUN mix local.hex --force && mix local.rebar --force
@@ -19,10 +19,15 @@ COPY mix.exs mix.lock ./
 RUN mix deps.get --only prod
 RUN mix deps.compile
 
+COPY package.json tailwind.config.js ./
+RUN npm install
+
 COPY lib ./lib
+COPY assets ./assets
 COPY priv ./priv
 COPY content ./content
 
+RUN npm run build:css
 RUN mix compile
 RUN mix release
 

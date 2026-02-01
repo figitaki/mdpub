@@ -21,3 +21,6 @@ mdpub-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Node.js dependencies (for Tailwind CSS build)
+/node_modules/
