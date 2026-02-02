@@ -32,6 +32,7 @@ defmodule Mdpub.Web do
 
     case Mdpub.Content.lookup(path, content_dir) do
       {:ok, page} ->
+        # page already contains :path from content lookup
         html = Mdpub.PageLayout.render(page)
 
         conn
