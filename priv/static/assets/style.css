@@ -95,9 +95,9 @@
   --transition-normal: 200ms ease;
 }
 
-/* Dark Mode */
+/* Dark Mode - Applied via media query or data-theme attribute */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --color-bg: #0f172a;
     --color-surface: #1e293b;
     --color-surface-raised: #334155;
@@ -135,39 +135,7 @@
   }
 }
 
-/* Manual theme override classes */
-[data-theme="light"] {
-  --color-bg: #ffffff;
-  --color-surface: #f8fafc;
-  --color-surface-raised: #ffffff;
-  --color-text: #1e293b;
-  --color-text-secondary: #475569;
-  --color-text-muted: #64748b;
-  --color-link: #2563eb;
-  --color-link-hover: #1d4ed8;
-  --color-border: #e2e8f0;
-  --color-border-strong: #cbd5e1;
-  --color-accent: #3b82f6;
-  --color-accent-subtle: #eff6ff;
-  --color-code-bg: #f1f5f9;
-  --color-code-text: #0f172a;
-  --color-code-border: #e2e8f0;
-  --color-info-bg: #eff6ff;
-  --color-info-border: #bfdbfe;
-  --color-info-text: #1e40af;
-  --color-warning-bg: #fffbeb;
-  --color-warning-border: #fde68a;
-  --color-warning-text: #92400e;
-  --color-success-bg: #f0fdf4;
-  --color-success-border: #bbf7d0;
-  --color-success-text: #166534;
-  --color-danger-bg: #fef2f2;
-  --color-danger-border: #fecaca;
-  --color-danger-text: #991b1b;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-}
-
+/* Manual theme override - dark mode */
 [data-theme="dark"] {
   --color-bg: #0f172a;
   --color-surface: #1e293b;
@@ -198,6 +166,39 @@
   --color-danger-text: #fca5a5;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+}
+
+/* Manual theme override - light mode (explicit override of dark mode preference) */
+[data-theme="light"] {
+  --color-bg: #ffffff;
+  --color-surface: #f8fafc;
+  --color-surface-raised: #ffffff;
+  --color-text: #1e293b;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748b;
+  --color-link: #2563eb;
+  --color-link-hover: #1d4ed8;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-accent: #3b82f6;
+  --color-accent-subtle: #eff6ff;
+  --color-code-bg: #f1f5f9;
+  --color-code-text: #0f172a;
+  --color-code-border: #e2e8f0;
+  --color-info-bg: #eff6ff;
+  --color-info-border: #bfdbfe;
+  --color-info-text: #1e40af;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fde68a;
+  --color-warning-text: #92400e;
+  --color-success-bg: #f0fdf4;
+  --color-success-border: #bbf7d0;
+  --color-success-text: #166534;
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-danger-text: #991b1b;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
 /* ==========================================================================
@@ -257,15 +258,31 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background-color: var(--color-bg);
   border-bottom: 1px solid var(--color-border);
-  backdrop-filter: blur(8px);
-  background-color: color-mix(in srgb, var(--color-bg) 85%, transparent);
+  /* Fallback for browsers without backdrop-filter support */
+  background-color: var(--color-bg);
 }
 
-@supports not (backdrop-filter: blur(8px)) {
+/* Modern browsers with backdrop-filter support get translucent header */
+@supports (backdrop-filter: blur(8px)) {
   .header {
-    background-color: var(--color-bg);
+    backdrop-filter: blur(8px);
+    /* Use rgba with alpha for better browser compatibility than color-mix */
+    background-color: rgba(255, 255, 255, 0.85);
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .header {
+      background-color: rgba(15, 23, 42, 0.85); /* --color-bg dark with 85% opacity */
+    }
+  }
+  
+  [data-theme="dark"] .header {
+    background-color: rgba(15, 23, 42, 0.85);
+  }
+  
+  [data-theme="light"] .header {
+    background-color: rgba(255, 255, 255, 0.85);
   }
 }
 
@@ -1069,7 +1086,72 @@ body {
 }
 
 /* ==========================================================================
-   17. Responsive Design
+   17. Focus Styles
+   ========================================================================== */
+
+/* Remove default focus outline and apply custom focus-visible styles */
+*:focus {
+  outline: none;
+}
+
+/* Focus styles for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Links - more subtle focus for better readability */
+a:focus-visible {
+  outline-offset: 3px;
+  text-decoration-thickness: 2px;
+}
+
+/* Header links */
+.header__link:focus-visible,
+.header__brand:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Theme toggle button */
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--color-accent-subtle);
+}
+
+/* Buttons */
+.btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--color-accent-subtle);
+}
+
+/* Code block copy button */
+.code-block__copy:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Navigation links */
+.breadcrumb__link:focus-visible,
+.doc-nav__link:focus-visible,
+.footer__link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Table of contents links */
+.toc__link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  color: var(--color-text);
+}
+
+/* ==========================================================================
+   18. Responsive Design
    ========================================================================== */
 
 @media (max-width: 768px) {
