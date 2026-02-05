@@ -17,7 +17,8 @@ defmodule Mdpub.PageLayout do
   @nav_items [
     %{href: "/", label: "Home"},
     %{href: "/getting-started", label: "Getting Started"},
-    %{href: "/docs/routing", label: "Docs"}
+    %{href: "/docs/routing", label: "Docs"},
+    %{href: "/mermaid", label: "Mermaid"}
   ]
 
   def render(%{title: title, body_html: body_html, path: path}) do
@@ -87,7 +88,7 @@ defmodule Mdpub.PageLayout do
           #{render_footer(base)}
         </div>
 
-        #{render_scripts()}
+        #{render_scripts(base)}
       </body>
     </html>
     """
@@ -245,14 +246,16 @@ defmodule Mdpub.PageLayout do
         <div class="footer__links">
           <a class="footer__link" href="#{escape(base)}/getting-started">Getting Started</a>
           <a class="footer__link" href="#{escape(base)}/docs/routing">Documentation</a>
+          <a class="footer__link" href="#{escape(base)}/mermaid">Mermaid</a>
         </div>
       </div>
     </footer>
     """
   end
 
-  defp render_scripts do
+  defp render_scripts(base) do
     """
+    <script defer src="#{escape(base)}/assets/mermaid.min.js"></script>
     <script>
     (function() {
       // Theme toggle
@@ -336,6 +339,12 @@ defmodule Mdpub.PageLayout do
           wrapper.appendChild(label);
         }
       });
+
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.mermaid) {
+          mermaid.initialize({ startOnLoad: true, securityLevel: "strict" });
+        }
+      });
     })();
     </script>
     """
@@ -375,7 +384,8 @@ defmodule Mdpub.PageLayout do
   @doc_order [
     %{path: "index", title: "Home", href: "/"},
     %{path: "getting-started", title: "Getting Started", href: "/getting-started"},
-    %{path: "docs/routing", title: "Routing", href: "/docs/routing"}
+    %{path: "docs/routing", title: "Routing", href: "/docs/routing"},
+    %{path: "mermaid", title: "Mermaid", href: "/mermaid"}
   ]
 
   defp build_doc_nav(nil), do: nil

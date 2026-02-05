@@ -646,6 +646,16 @@ body {
   opacity: 1;
 }
 
+.prose .mermaid {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.prose .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
 .code-block__copy:hover {
   color: var(--color-text);
   background-color: var(--color-surface-raised);
