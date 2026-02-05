@@ -1082,12 +1082,28 @@ body {
   }
 
   .header__nav {
-    gap: 0;
+    gap: var(--space-1);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .header__nav::-webkit-scrollbar {
+    display: none;
   }
 
   .header__link {
+    flex: 0 0 auto;
     padding: var(--space-2);
     font-size: var(--text-xs);
+    white-space: nowrap;
+  }
+
+  .prose table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .prose h1 {
@@ -1138,6 +1154,12 @@ body {
 
   .prose h2 {
     font-size: var(--text-lg);
+  }
+
+  .code-block__copy {
+    opacity: 1;
+    width: 2.25rem;
+    height: 2.25rem;
   }
 }
 
