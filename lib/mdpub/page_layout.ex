@@ -17,7 +17,8 @@ defmodule Mdpub.PageLayout do
   @nav_items [
     %{href: "/", label: "Home"},
     %{href: "/getting-started", label: "Getting Started"},
-    %{href: "/docs/routing", label: "Docs"}
+    %{href: "/docs/routing", label: "Docs"},
+    %{href: "/mermaid", label: "Mermaid"}
   ]
 
   def render(%{title: title, body_html: body_html, path: path}) do
@@ -87,7 +88,7 @@ defmodule Mdpub.PageLayout do
           #{render_footer(base)}
         </div>
 
-        #{render_scripts()}
+        #{render_scripts(base)}
       </body>
     </html>
     """
@@ -245,16 +246,27 @@ defmodule Mdpub.PageLayout do
         <div class="footer__links">
           <a class="footer__link" href="#{escape(base)}/getting-started">Getting Started</a>
           <a class="footer__link" href="#{escape(base)}/docs/routing">Documentation</a>
+          <a class="footer__link" href="#{escape(base)}/mermaid">Mermaid</a>
         </div>
       </div>
     </footer>
     """
   end
 
-  defp render_scripts do
+  defp render_scripts(base) do
     """
+    <script id="mermaid-script" defer src="#{escape(base)}/assets/mermaid.min.js"></script>
     <script>
     (function() {
+      // Initialize Mermaid when script loads (handles defer timing correctly)
+      var mermaidScript = document.getElementById('mermaid-script');
+      if (mermaidScript) {
+        mermaidScript.onload = function() {
+          if (window.mermaid) {
+            mermaid.initialize({ startOnLoad: true, securityLevel: "strict" });
+          }
+        };
+      }
       // Theme toggle
       const toggle = document.querySelector('.theme-toggle');
       const html = document.documentElement;
@@ -293,6 +305,9 @@ defmodule Mdpub.PageLayout do
       document.querySelectorAll('pre').forEach(function(pre) {
         const code = pre.querySelector('code');
         if (!code) return;
+
+        // Skip mermaid diagrams - they are rendered by Mermaid.js
+        if (code.classList.contains('mermaid')) return;
 
         // Wrap in container
         const wrapper = document.createElement('div');
@@ -375,7 +390,8 @@ defmodule Mdpub.PageLayout do
   @doc_order [
     %{path: "index", title: "Home", href: "/"},
     %{path: "getting-started", title: "Getting Started", href: "/getting-started"},
-    %{path: "docs/routing", title: "Routing", href: "/docs/routing"}
+    %{path: "docs/routing", title: "Routing", href: "/docs/routing"},
+    %{path: "mermaid", title: "Mermaid", href: "/mermaid"}
   ]
 
   defp build_doc_nav(nil), do: nil

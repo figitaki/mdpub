@@ -27,6 +27,7 @@ Visit [http://localhost:4000](http://localhost:4000) to see your docs.
 |------|-------------|
 | [Getting Started](/getting-started) | Installation and configuration |
 | [Routing](/docs/routing) | URL routing and file structure |
+| [Mermaid](/mermaid) | Diagram examples and usage |
 
 ## How It Works
 

@@ -136,10 +136,69 @@ defmodule Mdpub.Content do
   end
 
   defp markdown_to_html(md) do
+    options =
+      Earmark.Options.make_options!(
+        smartypants: false,
+        code_class_prefix: "language-",
+        postprocessor: &mermaid_postprocessor/1
+      )
+
     # Earmark returns {:ok, html, warnings}
-    case Earmark.as_html(md, smartypants: false, code_class_prefix: "language-") do
+    case Earmark.as_html(md, options) do
       {:ok, html, _warnings} -> {:ok, html}
       {:error, html, _warnings} -> {:ok, html}
+    end
+  end
+
+  defp mermaid_postprocessor({"pre", pre_attrs, [{"code", code_attrs, code_content, code_meta}], meta}) do
+    if mermaid_code_block?(code_attrs) do
+      # Earmark adds `language-mermaid` class (via code_class_prefix option).
+      # Mermaid.js queries for `.mermaid` nodes, so we add that class explicitly.
+      #
+      # We only add `mermaid` to <code>, not <pre>. If we added it to <pre>,
+      # Mermaid would try to parse the *HTML* inside <pre> (including the
+      # nested <code> tag), which fails with "Syntax error in text".
+      code_attrs = ensure_class(code_attrs, "mermaid")
+      {"pre", pre_attrs, [{"code", code_attrs, code_content, code_meta}], meta}
+    else
+      {"pre", pre_attrs, [{"code", code_attrs, code_content, code_meta}], meta}
+    end
+  end
+
+  defp mermaid_postprocessor(node), do: node
+
+  defp mermaid_code_block?(attrs) do
+    case List.keyfind(attrs, "class", 0) do
+      {"class", class} ->
+        class
+        |> String.split()
+        |> Enum.member?("language-mermaid")
+
+      _ ->
+        false
+    end
+  end
+
+  defp ensure_class(attrs, class) do
+    case List.keyfind(attrs, "class", 0) do
+      nil ->
+        [{"class", class} | attrs]
+
+      {"class", existing} ->
+        classes =
+          existing
+          |> String.split()
+
+        if class in classes do
+          attrs
+        else
+          new_classes =
+            classes
+            |> Kernel.++([class])
+            |> Enum.uniq()
+
+          List.keyreplace(attrs, "class", 0, {"class", Enum.join(new_classes, " ")})
+        end
     end
   end
 

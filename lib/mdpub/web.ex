@@ -17,7 +17,7 @@ defmodule Mdpub.Web do
     at: "/assets",
     from: {:mdpub, "priv/static/assets"},
     gzip: false,
-    only: ~w(style.css)
+    only: ~w(style.css mermaid.min.js)
   )
 
   plug(:match)

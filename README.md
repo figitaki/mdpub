@@ -10,6 +10,20 @@ A simple Elixir-based docs/publishing framework: serve Markdown files from a dir
 - Optional file watching (invalidates cache on change)
 - Single binary release (via `mix release`)
 
+## Mermaid diagrams
+
+mdpub ships with Mermaid support. Add a fenced code block with the `mermaid` language:
+
+````markdown
+```mermaid
+flowchart TD
+  A[Write docs] --> B{Add diagrams?}
+  B -- Yes --> C[Ship with Mermaid]
+```
+````
+
+Mermaid is loaded from `priv/static/assets/mermaid.min.js` and initialized with `securityLevel: "strict"`.
+
 ## Run locally
 
 ```bash
