@@ -188,12 +188,16 @@ defmodule Mdpub.Content do
         classes =
           existing
           |> String.split()
-          |> Enum.uniq()
 
         if class in classes do
           attrs
         else
-          List.keyreplace(attrs, "class", 0, {"class", Enum.join(classes ++ [class], " ")})
+          new_classes =
+            classes
+            |> Kernel.++([class])
+            |> Enum.uniq()
+
+          List.keyreplace(attrs, "class", 0, {"class", Enum.join(new_classes, " ")})
         end
     end
   end
