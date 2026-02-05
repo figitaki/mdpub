@@ -255,9 +255,18 @@ defmodule Mdpub.PageLayout do
 
   defp render_scripts(base) do
     """
-    <script defer src="#{escape(base)}/assets/mermaid.min.js"></script>
+    <script id="mermaid-script" defer src="#{escape(base)}/assets/mermaid.min.js"></script>
     <script>
     (function() {
+      // Initialize Mermaid when script loads (handles defer timing correctly)
+      var mermaidScript = document.getElementById('mermaid-script');
+      if (mermaidScript) {
+        mermaidScript.onload = function() {
+          if (window.mermaid) {
+            mermaid.initialize({ startOnLoad: true, securityLevel: "strict" });
+          }
+        };
+      }
       // Theme toggle
       const toggle = document.querySelector('.theme-toggle');
       const html = document.documentElement;
@@ -296,6 +305,9 @@ defmodule Mdpub.PageLayout do
       document.querySelectorAll('pre').forEach(function(pre) {
         const code = pre.querySelector('code');
         if (!code) return;
+
+        // Skip mermaid diagrams - they are rendered by Mermaid.js
+        if (code.classList.contains('mermaid')) return;
 
         // Wrap in container
         const wrapper = document.createElement('div');
@@ -337,12 +349,6 @@ defmodule Mdpub.PageLayout do
           label.className = 'code-block__lang';
           label.textContent = lang;
           wrapper.appendChild(label);
-        }
-      });
-
-      document.addEventListener('DOMContentLoaded', function() {
-        if (window.mermaid) {
-          mermaid.initialize({ startOnLoad: true, securityLevel: "strict" });
         }
       });
     })();

@@ -152,12 +152,12 @@ defmodule Mdpub.Content do
 
   defp mermaid_postprocessor({"pre", pre_attrs, [{"code", code_attrs, code_content, code_meta}], meta}) do
     if mermaid_code_block?(code_attrs) do
-      # Earmark already adds a `mermaid` class on the <code> node for fenced
-      # blocks like ```mermaid. Mermaid JS queries for `.mermaid` nodes.
+      # Earmark adds `language-mermaid` class (via code_class_prefix option).
+      # Mermaid.js queries for `.mermaid` nodes, so we add that class explicitly.
       #
-      # If we also add `mermaid` to the surrounding <pre>, Mermaid will try to
-      # parse the *HTML* inside <pre> (including the nested <code> tag), which
-      # fails with "Syntax error in text".
+      # We only add `mermaid` to <code>, not <pre>. If we added it to <pre>,
+      # Mermaid would try to parse the *HTML* inside <pre> (including the
+      # nested <code> tag), which fails with "Syntax error in text".
       code_attrs = ensure_class(code_attrs, "mermaid")
       {"pre", pre_attrs, [{"code", code_attrs, code_content, code_meta}], meta}
     else
