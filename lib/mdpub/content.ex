@@ -60,6 +60,52 @@ defmodule Mdpub.Content do
     end
   end
 
+  @default_nav_items [
+    %{"label" => "Home", "href" => "/"},
+    %{"label" => "Getting Started", "href" => "/getting-started"},
+    %{"label" => "Docs", "href" => "/docs/routing"},
+    %{"label" => "Mermaid", "href" => "/mermaid"}
+  ]
+
+  @doc """
+  Load navigation config from `_nav.json` in the content directory.
+
+  Returns a list of nav items like `[%{"label" => "Home", "href" => "/"}]`.
+  Falls back to built-in defaults if the file doesn't exist or is invalid.
+  """
+  def load_nav_config(content_dir) do
+    nav_file = Path.join(content_dir, "_nav.json")
+    cache_key = {:nav_config, nav_file}
+
+    case File.stat(nav_file) do
+      {:ok, %File.Stat{mtime: mtime}} ->
+        case :ets.lookup(@cache_table, cache_key) do
+          [{^cache_key, ^mtime, items}] ->
+            items
+
+          _ ->
+            items = parse_nav_file(nav_file)
+            :ets.insert(@cache_table, {cache_key, mtime, items})
+            items
+        end
+
+      {:error, _} ->
+        @default_nav_items
+    end
+  end
+
+  defp parse_nav_file(path) do
+    with {:ok, json} <- File.read(path),
+         {:ok, decoded} <- JSON.decode(json),
+         %{"items" => items} when is_list(items) <- decoded do
+      Enum.filter(items, fn item ->
+        is_map(item) and is_binary(item["label"]) and is_binary(item["href"])
+      end)
+    else
+      _ -> @default_nav_items
+    end
+  end
+
   def invalidate(rel_path) do
     :ets.delete(@cache_table, rel_path)
     :ok
