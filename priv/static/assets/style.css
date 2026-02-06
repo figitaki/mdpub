@@ -531,6 +531,31 @@ body {
   list-style-type: square;
 }
 
+/* Task Lists (GitHub-style checklists) */
+.prose .task-list-item {
+  list-style-type: none;
+  position: relative;
+  margin-left: calc(var(--space-6) * -1);
+  padding-left: var(--space-6);
+}
+
+.prose .task-list-item input[type="checkbox"] {
+  position: absolute;
+  left: 0;
+  top: 0.3em;
+  width: 1em;
+  height: 1em;
+  margin: 0;
+  accent-color: var(--color-accent);
+  cursor: default;
+}
+
+/* Ensure nested task lists align properly */
+.prose li > ul .task-list-item,
+.prose li > ol .task-list-item {
+  margin-left: 0;
+}
+
 /* Blockquotes */
 .prose blockquote {
   margin: var(--space-6) 0;
