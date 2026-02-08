@@ -1,0 +1,8 @@
+{
+  "items": [
+    { "label": "Home", "href": "/" },
+    { "label": "Getting Started", "href": "/getting-started" },
+    { "label": "Docs", "href": "/docs/routing" },
+    { "label": "Mermaid", "href": "/mermaid" }
+  ]
+}
