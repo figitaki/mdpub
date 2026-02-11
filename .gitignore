@@ -21,3 +21,10 @@ mdpub-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Phoenix static digest
+/priv/static/cache_manifest.json
+
+# esbuild output (built from assets/js/)
+/priv/static/assets/app.js
+/priv/static/assets/app.js.map

@@ -1,18 +1,8 @@
 defmodule Mdpub do
   @moduledoc """
-  Documentation for `Mdpub`.
+  Mdpub is a markdown documentation publisher built on Phoenix LiveView.
+
+  It serves Markdown files from a content directory, renders them as HTML,
+  and provides live navigation and automatic content reloading.
   """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Mdpub.hello()
-      :world
-
-  """
-  def hello do
-    :world
-  end
 end

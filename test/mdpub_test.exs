@@ -1,8 +1,7 @@
 defmodule MdpubTest do
   use ExUnit.Case
-  doctest Mdpub
 
-  test "greets the world" do
-    assert Mdpub.hello() == :world
+  test "content_dir defaults to ./content" do
+    assert Mdpub.Content.content_dir() |> String.ends_with?("content")
   end
 end
