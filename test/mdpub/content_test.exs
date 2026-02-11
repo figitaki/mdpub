@@ -113,7 +113,9 @@ defmodule Mdpub.ContentTest do
   end
 
   # Helper functions that mirror the Content module implementation
-  defp apply_mermaid_postprocessor({"pre", pre_attrs, [{"code", code_attrs, code_content, code_meta}], meta}) do
+  defp apply_mermaid_postprocessor(
+         {"pre", pre_attrs, [{"code", code_attrs, code_content, code_meta}], meta}
+       ) do
     if mermaid_code_block?(code_attrs) do
       code_attrs = ensure_class(code_attrs, "mermaid")
       {"pre", pre_attrs, [{"code", code_attrs, code_content, code_meta}], meta}

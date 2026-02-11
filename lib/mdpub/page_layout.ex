@@ -143,6 +143,7 @@ defmodule Mdpub.PageLayout do
 
   defp is_nav_active?(href, nil), do: false
   defp is_nav_active?("/", current_path), do: current_path in ["index.md", "index"]
+
   defp is_nav_active?(href, current_path) do
     # Remove leading slash and add .md for comparison
     href_normalized = String.trim_leading(href, "/")
@@ -174,6 +175,7 @@ defmodule Mdpub.PageLayout do
 
   defp render_breadcrumb(nil), do: ""
   defp render_breadcrumb([]), do: ""
+
   defp render_breadcrumb(items) do
     breadcrumb_items =
       items
@@ -203,28 +205,35 @@ defmodule Mdpub.PageLayout do
 
   defp render_doc_nav(nil, _base), do: ""
   defp render_doc_nav(%{prev: nil, next: nil}, _base), do: ""
-  defp render_doc_nav(nav_links, base) do
-    prev_html = case nav_links.prev do
-      nil -> ""
-      link ->
-        """
-        <a class="doc-nav__link doc-nav__link--prev" href="#{escape(base)}#{escape(link.href)}">
-          <span class="doc-nav__label">Previous</span>
-          <span class="doc-nav__title">#{escape(link.title)}</span>
-        </a>
-        """
-    end
 
-    next_html = case nav_links.next do
-      nil -> ""
-      link ->
-        """
-        <a class="doc-nav__link doc-nav__link--next" href="#{escape(base)}#{escape(link.href)}">
-          <span class="doc-nav__label">Next</span>
-          <span class="doc-nav__title">#{escape(link.title)}</span>
-        </a>
-        """
-    end
+  defp render_doc_nav(nav_links, base) do
+    prev_html =
+      case nav_links.prev do
+        nil ->
+          ""
+
+        link ->
+          """
+          <a class="doc-nav__link doc-nav__link--prev" href="#{escape(base)}#{escape(link.href)}">
+            <span class="doc-nav__label">Previous</span>
+            <span class="doc-nav__title">#{escape(link.title)}</span>
+          </a>
+          """
+      end
+
+    next_html =
+      case nav_links.next do
+        nil ->
+          ""
+
+        link ->
+          """
+          <a class="doc-nav__link doc-nav__link--next" href="#{escape(base)}#{escape(link.href)}">
+            <span class="doc-nav__label">Next</span>
+            <span class="doc-nav__title">#{escape(link.title)}</span>
+          </a>
+          """
+      end
 
     if prev_html == "" and next_html == "" do
       ""
@@ -359,6 +368,7 @@ defmodule Mdpub.PageLayout do
   defp build_breadcrumb(nil), do: nil
   defp build_breadcrumb("index.md"), do: nil
   defp build_breadcrumb("index"), do: nil
+
   defp build_breadcrumb(path) do
     base = base_path()
     path = String.trim_trailing(path, ".md")
@@ -395,15 +405,19 @@ defmodule Mdpub.PageLayout do
   ]
 
   defp build_doc_nav(nil), do: nil
+
   defp build_doc_nav(current_path) do
     normalized = current_path |> String.trim_trailing(".md") |> String.trim_trailing("/index")
 
-    current_idx = Enum.find_index(@doc_order, fn doc ->
-      doc.path == normalized or doc.path == "#{normalized}/index"
-    end)
+    current_idx =
+      Enum.find_index(@doc_order, fn doc ->
+        doc.path == normalized or doc.path == "#{normalized}/index"
+      end)
 
     case current_idx do
-      nil -> %{prev: nil, next: nil}
+      nil ->
+        %{prev: nil, next: nil}
+
       idx ->
         prev = if idx > 0, do: Enum.at(@doc_order, idx - 1), else: nil
         next = if idx < length(@doc_order) - 1, do: Enum.at(@doc_order, idx + 1), else: nil

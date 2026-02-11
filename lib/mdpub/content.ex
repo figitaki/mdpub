@@ -157,7 +157,9 @@ defmodule Mdpub.Content do
     |> task_list_postprocessor()
   end
 
-  defp mermaid_postprocessor({"pre", pre_attrs, [{"code", code_attrs, code_content, code_meta}], meta}) do
+  defp mermaid_postprocessor(
+         {"pre", pre_attrs, [{"code", code_attrs, code_content, code_meta}], meta}
+       ) do
     if mermaid_code_block?(code_attrs) do
       # Earmark adds `language-mermaid` class (via code_class_prefix option).
       # Mermaid.js queries for `.mermaid` nodes, so we add that class explicitly.
@@ -180,7 +182,8 @@ defmodule Mdpub.Content do
   # Note: We use {:replace, node} to replace the entire node including children.
   # Returning just {tag, attrs, children, meta} would cause Earmark to ignore
   # the children and descend into the original content.
-  defp task_list_postprocessor({"li", attrs, [first_child | rest], meta} = node) when is_binary(first_child) do
+  defp task_list_postprocessor({"li", attrs, [first_child | rest], meta} = node)
+       when is_binary(first_child) do
     case parse_task_item(first_child) do
       {:task, checked, remaining_text} ->
         checkbox = build_checkbox(checked)
@@ -194,7 +197,9 @@ defmodule Mdpub.Content do
   end
 
   # Handle li with nested elements (e.g., paragraph inside li in loose lists)
-  defp task_list_postprocessor({"li", attrs, [{"p", p_attrs, [first_child | p_rest], p_meta} | rest], meta})
+  defp task_list_postprocessor(
+         {"li", attrs, [{"p", p_attrs, [first_child | p_rest], p_meta} | rest], meta}
+       )
        when is_binary(first_child) do
     case parse_task_item(first_child) do
       {:task, checked, remaining_text} ->
