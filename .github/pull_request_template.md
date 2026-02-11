@@ -10,6 +10,5 @@
 - [ ] Other (specify):
 
 ## Checklist
-- [ ] Changelog/CONTRIBUTING updated (if needed)
-- [ ] Docs updated (if needed)
+- [ ] Readme / docs updated (for feature work)
 - [ ] Screenshots attached (if UI change)
