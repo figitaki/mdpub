@@ -56,6 +56,10 @@ docker run --rm -p 4000:4000 \
   mdpub:dev
 ```
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for commit conventions and release steps.
+
 ## Notes
 
 This project intentionally stays minimal (Plug + Bandit + Earmark).
