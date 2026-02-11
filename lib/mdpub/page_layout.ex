@@ -4,6 +4,7 @@ defmodule Mdpub.PageLayout do
 
   Provides a consistent shell layout with:
   - Sticky header with branding and navigation
+  - Mobile-friendly hamburger menu
   - Theme toggle (light/dark mode)
   - Breadcrumb navigation
   - Centered content area with optimal reading width
@@ -13,25 +14,22 @@ defmodule Mdpub.PageLayout do
 
   @app_name "mdpub"
 
-  # Navigation structure - can be extended
-  @nav_items [
-    %{href: "/", label: "Home"},
-    %{href: "/getting-started", label: "Getting Started"},
-    %{href: "/docs/routing", label: "Docs"},
-    %{href: "/mermaid", label: "Mermaid"}
-  ]
+  def render(%{title: title, body_html: body_html, path: path, nav_items: nav_items}) do
+    breadcrumb = build_breadcrumb(path)
+    nav_links = build_doc_nav(path, nav_items)
+    page(title, body_html, breadcrumb, nav_links, path, nav_items)
+  end
 
   def render(%{title: title, body_html: body_html, path: path}) do
     breadcrumb = build_breadcrumb(path)
-    nav_links = build_doc_nav(path)
-    page(title, body_html, breadcrumb, nav_links, path)
+    page(title, body_html, breadcrumb, nil, path, [])
   end
 
   def render(%{title: title, body_html: body_html}) do
-    page(title, body_html, nil, nil, nil)
+    page(title, body_html, nil, nil, nil, [])
   end
 
-  def render_404(path_segments) do
+  def render_404(path_segments, nav_items \\ []) do
     requested = "/" <> Enum.join(path_segments, "/")
 
     body = """
@@ -40,10 +38,10 @@ defmodule Mdpub.PageLayout do
     <p><a href="#{base_path()}/">Return to home</a></p>
     """
 
-    page("Not found", body, nil, nil, nil)
+    page("Not found", body, nil, nil, nil, nav_items)
   end
 
-  def render_error(path_segments, reason) do
+  def render_error(path_segments, reason, nav_items \\ []) do
     requested = "/" <> Enum.join(path_segments, "/")
 
     body = """
@@ -53,10 +51,10 @@ defmodule Mdpub.PageLayout do
     <p><a href="#{base_path()}/">Return to home</a></p>
     """
 
-    page("Error", body, nil, nil, nil)
+    page("Error", body, nil, nil, nil, nav_items)
   end
 
-  defp page(title, body_html, breadcrumb, nav_links, current_path) do
+  defp page(title, body_html, breadcrumb, nav_links, current_path, nav_items) do
     base = base_path()
 
     """
@@ -73,7 +71,7 @@ defmodule Mdpub.PageLayout do
       </head>
       <body>
         <div class="site-wrapper">
-          #{render_header(base, current_path)}
+          #{render_header(base, current_path, nav_items)}
 
           <main class="main">
             <div class="container">
@@ -85,7 +83,7 @@ defmodule Mdpub.PageLayout do
             </div>
           </main>
 
-          #{render_footer(base)}
+          #{render_footer(base, nav_items)}
         </div>
 
         #{render_scripts(base)}
@@ -99,7 +97,7 @@ defmodule Mdpub.PageLayout do
     ""
   end
 
-  defp render_header(base, current_path) do
+  defp render_header(base, current_path, nav_items) do
     """
     <header class="header">
       <div class="container header__inner">
@@ -107,12 +105,58 @@ defmodule Mdpub.PageLayout do
           #{render_logo()}
           #{@app_name}
         </a>
-        <nav class="header__nav">
-          #{render_nav_links(base, current_path)}
+        <nav class="header__nav" id="desktop-nav">
+          #{render_nav_links(base, current_path, nav_items)}
           #{render_theme_toggle()}
         </nav>
+        <div class="header__mobile-controls">
+          #{render_theme_toggle()}
+          #{render_hamburger()}
+        </div>
       </div>
     </header>
+    #{render_mobile_nav(base, current_path, nav_items)}
+    """
+  end
+
+  defp render_hamburger do
+    """
+    <button class="nav-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav">
+      <svg class="nav-toggle__icon nav-toggle__icon--menu" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+      <svg class="nav-toggle__icon nav-toggle__icon--close" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+    """
+  end
+
+  defp render_mobile_nav(base, current_path, nav_items) do
+    links =
+      nav_items
+      |> Enum.map(fn item ->
+        href = item["href"]
+        label = item["label"]
+        is_active = is_nav_active?(href, current_path)
+        active_class = if is_active, do: " mobile-nav__link--active", else: ""
+
+        """
+        <a class="mobile-nav__link#{active_class}" href="#{escape(base)}#{escape(href)}">#{escape(label)}</a>
+        """
+      end)
+      |> Enum.join("")
+
+    """
+    <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+      <nav class="mobile-nav__body">
+        #{links}
+      </nav>
+    </div>
+    <div class="mobile-nav__overlay" id="mobile-nav-overlay" aria-hidden="true"></div>
     """
   end
 
@@ -128,9 +172,11 @@ defmodule Mdpub.PageLayout do
     """
   end
 
-  defp render_nav_links(base, current_path) do
-    @nav_items
-    |> Enum.map(fn %{href: href, label: label} ->
+  defp render_nav_links(base, current_path, nav_items) do
+    nav_items
+    |> Enum.map(fn item ->
+      href = item["href"]
+      label = item["label"]
       is_active = is_nav_active?(href, current_path)
       active_class = if is_active, do: " header__link--active", else: ""
 
@@ -141,10 +187,9 @@ defmodule Mdpub.PageLayout do
     |> Enum.join("")
   end
 
-  defp is_nav_active?(href, nil), do: false
+  defp is_nav_active?(_href, nil), do: false
   defp is_nav_active?("/", current_path), do: current_path in ["index.md", "index"]
   defp is_nav_active?(href, current_path) do
-    # Remove leading slash and add .md for comparison
     href_normalized = String.trim_leading(href, "/")
     path_normalized = String.trim_trailing(current_path, ".md")
 
@@ -238,15 +283,24 @@ defmodule Mdpub.PageLayout do
     end
   end
 
-  defp render_footer(base) do
+  defp render_footer(base, nav_items) do
+    # Use nav items for footer links (skip Home since it's the brand link)
+    footer_links =
+      nav_items
+      |> Enum.reject(fn item -> item["href"] == "/" end)
+      |> Enum.map(fn item ->
+        """
+        <a class="footer__link" href="#{escape(base)}#{escape(item["href"])}">#{escape(item["label"])}</a>
+        """
+      end)
+      |> Enum.join("")
+
     """
     <footer class="footer">
       <div class="container footer__inner">
         <span class="footer__text">Powered by #{@app_name}</span>
         <div class="footer__links">
-          <a class="footer__link" href="#{escape(base)}/getting-started">Getting Started</a>
-          <a class="footer__link" href="#{escape(base)}/docs/routing">Documentation</a>
-          <a class="footer__link" href="#{escape(base)}/mermaid">Mermaid</a>
+          #{footer_links}
         </div>
       </div>
     </footer>
@@ -259,7 +313,7 @@ defmodule Mdpub.PageLayout do
     <script>
     (function() {
       // Initialize Mermaid when script loads (handles defer timing correctly)
-      var mermaidScript = document.getElementById('mermaid-script');
+      const mermaidScript = document.getElementById('mermaid-script');
       if (mermaidScript) {
         mermaidScript.onload = function() {
           if (window.mermaid) {
@@ -267,11 +321,10 @@ defmodule Mdpub.PageLayout do
           }
         };
       }
-      // Theme toggle
-      const toggle = document.querySelector('.theme-toggle');
+      // Theme toggle (handle both desktop and mobile toggle buttons)
+      const toggles = document.querySelectorAll('.theme-toggle');
       const html = document.documentElement;
 
-      // Check for saved theme preference or system preference
       function getPreferredTheme() {
         const saved = localStorage.getItem('theme');
         if (saved) return saved;
@@ -286,13 +339,13 @@ defmodule Mdpub.PageLayout do
       // Initialize theme
       setTheme(getPreferredTheme());
 
-      // Toggle handler
-      if (toggle) {
+      // Toggle handler for all theme toggle buttons
+      toggles.forEach(function(toggle) {
         toggle.addEventListener('click', function() {
           const current = html.getAttribute('data-theme') || getPreferredTheme();
           setTheme(current === 'dark' ? 'light' : 'dark');
         });
-      }
+      });
 
       // Listen for system preference changes
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
@@ -300,6 +353,59 @@ defmodule Mdpub.PageLayout do
           setTheme(e.matches ? 'dark' : 'light');
         }
       });
+
+      // Mobile navigation toggle
+      const navToggle = document.querySelector('.nav-toggle');
+      const mobileNav = document.getElementById('mobile-nav');
+      const overlay = document.getElementById('mobile-nav-overlay');
+
+      function openMobileNav() {
+        mobileNav.classList.add('mobile-nav--open');
+        overlay.classList.add('mobile-nav__overlay--visible');
+        navToggle.setAttribute('aria-expanded', 'true');
+        navToggle.setAttribute('aria-label', 'Close navigation menu');
+        mobileNav.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        // Focus first link
+        const firstLink = mobileNav.querySelector('.mobile-nav__link');
+        if (firstLink) firstLink.focus();
+      }
+
+      function closeMobileNav() {
+        mobileNav.classList.remove('mobile-nav--open');
+        overlay.classList.remove('mobile-nav__overlay--visible');
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.setAttribute('aria-label', 'Open navigation menu');
+        mobileNav.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        navToggle.focus();
+      }
+
+      if (navToggle && mobileNav && overlay) {
+        navToggle.addEventListener('click', function() {
+          const isOpen = mobileNav.classList.contains('mobile-nav--open');
+          if (isOpen) {
+            closeMobileNav();
+          } else {
+            openMobileNav();
+          }
+        });
+
+        // Close on overlay click
+        overlay.addEventListener('click', closeMobileNav);
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && mobileNav.classList.contains('mobile-nav--open')) {
+            closeMobileNav();
+          }
+        });
+
+        // Close mobile nav on link click (navigating away)
+        mobileNav.querySelectorAll('.mobile-nav__link').forEach(function(link) {
+          link.addEventListener('click', closeMobileNav);
+        });
+      }
 
       // Code block copy buttons
       document.querySelectorAll('pre').forEach(function(pre) {
@@ -386,27 +492,28 @@ defmodule Mdpub.PageLayout do
     |> Enum.join(" ")
   end
 
-  # Document navigation - ordered list of pages
-  @doc_order [
-    %{path: "index", title: "Home", href: "/"},
-    %{path: "getting-started", title: "Getting Started", href: "/getting-started"},
-    %{path: "docs/routing", title: "Routing", href: "/docs/routing"},
-    %{path: "mermaid", title: "Mermaid", href: "/mermaid"}
-  ]
-
-  defp build_doc_nav(nil), do: nil
-  defp build_doc_nav(current_path) do
+  # Build doc navigation (prev/next) from the nav items list
+  defp build_doc_nav(nil, _nav_items), do: nil
+  defp build_doc_nav(_path, []), do: nil
+  defp build_doc_nav(current_path, nav_items) do
     normalized = current_path |> String.trim_trailing(".md") |> String.trim_trailing("/index")
 
-    current_idx = Enum.find_index(@doc_order, fn doc ->
+    doc_order =
+      Enum.map(nav_items, fn item ->
+        path = item["href"] |> String.trim_leading("/")
+        path = if path == "", do: "index", else: path
+        %{path: path, title: item["label"], href: item["href"]}
+      end)
+
+    current_idx = Enum.find_index(doc_order, fn doc ->
       doc.path == normalized or doc.path == "#{normalized}/index"
     end)
 
     case current_idx do
       nil -> %{prev: nil, next: nil}
       idx ->
-        prev = if idx > 0, do: Enum.at(@doc_order, idx - 1), else: nil
-        next = if idx < length(@doc_order) - 1, do: Enum.at(@doc_order, idx + 1), else: nil
+        prev = if idx > 0, do: Enum.at(doc_order, idx - 1), else: nil
+        next = if idx < length(doc_order) - 1, do: Enum.at(doc_order, idx + 1), else: nil
         %{prev: prev, next: next}
     end
   end

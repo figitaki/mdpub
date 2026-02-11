@@ -24,9 +24,16 @@ defmodule Mdpub.ContentWatcher do
   def handle_info({:file_event, _watcher_pid, {path, _events}}, state) do
     path = to_string(path)
 
-    if String.ends_with?(path, ".md") do
-      rel = Path.relative_to(Path.expand(path), state.content_dir)
-      Mdpub.Content.invalidate(rel)
+    cond do
+      String.ends_with?(path, ".md") ->
+        rel = Path.relative_to(Path.expand(path), state.content_dir)
+        Mdpub.Content.invalidate(rel)
+
+      Path.basename(path) == "_nav.json" ->
+        Mdpub.Content.invalidate({:nav_config, Path.expand(path)})
+
+      true ->
+        :ok
     end
 
     {:noreply, state}
