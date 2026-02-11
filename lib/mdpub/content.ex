@@ -61,10 +61,7 @@ defmodule Mdpub.Content do
   end
 
   @default_nav_items [
-    %{"label" => "Home", "href" => "/"},
-    %{"label" => "Getting Started", "href" => "/getting-started"},
-    %{"label" => "Docs", "href" => "/docs/routing"},
-    %{"label" => "Mermaid", "href" => "/mermaid"}
+    %{"label" => "Home", "href" => "/"}
   ]
 
   @doc """

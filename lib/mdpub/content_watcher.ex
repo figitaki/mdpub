@@ -29,7 +29,7 @@ defmodule Mdpub.ContentWatcher do
         rel = Path.relative_to(Path.expand(path), state.content_dir)
         Mdpub.Content.invalidate(rel)
 
-      String.ends_with?(path, "_nav.json") ->
+      Path.basename(path) == "_nav.json" ->
         Mdpub.Content.invalidate({:nav_config, Path.expand(path)})
 
       true ->

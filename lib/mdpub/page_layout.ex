@@ -313,7 +313,7 @@ defmodule Mdpub.PageLayout do
     <script>
     (function() {
       // Initialize Mermaid when script loads (handles defer timing correctly)
-      var mermaidScript = document.getElementById('mermaid-script');
+      const mermaidScript = document.getElementById('mermaid-script');
       if (mermaidScript) {
         mermaidScript.onload = function() {
           if (window.mermaid) {
@@ -322,11 +322,11 @@ defmodule Mdpub.PageLayout do
         };
       }
       // Theme toggle (handle both desktop and mobile toggle buttons)
-      var toggles = document.querySelectorAll('.theme-toggle');
-      var html = document.documentElement;
+      const toggles = document.querySelectorAll('.theme-toggle');
+      const html = document.documentElement;
 
       function getPreferredTheme() {
-        var saved = localStorage.getItem('theme');
+        const saved = localStorage.getItem('theme');
         if (saved) return saved;
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
@@ -342,7 +342,7 @@ defmodule Mdpub.PageLayout do
       // Toggle handler for all theme toggle buttons
       toggles.forEach(function(toggle) {
         toggle.addEventListener('click', function() {
-          var current = html.getAttribute('data-theme') || getPreferredTheme();
+          const current = html.getAttribute('data-theme') || getPreferredTheme();
           setTheme(current === 'dark' ? 'light' : 'dark');
         });
       });
@@ -355,9 +355,9 @@ defmodule Mdpub.PageLayout do
       });
 
       // Mobile navigation toggle
-      var navToggle = document.querySelector('.nav-toggle');
-      var mobileNav = document.getElementById('mobile-nav');
-      var overlay = document.getElementById('mobile-nav-overlay');
+      const navToggle = document.querySelector('.nav-toggle');
+      const mobileNav = document.getElementById('mobile-nav');
+      const overlay = document.getElementById('mobile-nav-overlay');
 
       function openMobileNav() {
         mobileNav.classList.add('mobile-nav--open');
@@ -367,7 +367,7 @@ defmodule Mdpub.PageLayout do
         mobileNav.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
         // Focus first link
-        var firstLink = mobileNav.querySelector('.mobile-nav__link');
+        const firstLink = mobileNav.querySelector('.mobile-nav__link');
         if (firstLink) firstLink.focus();
       }
 
@@ -383,7 +383,7 @@ defmodule Mdpub.PageLayout do
 
       if (navToggle && mobileNav && overlay) {
         navToggle.addEventListener('click', function() {
-          var isOpen = mobileNav.classList.contains('mobile-nav--open');
+          const isOpen = mobileNav.classList.contains('mobile-nav--open');
           if (isOpen) {
             closeMobileNav();
           } else {
@@ -409,20 +409,20 @@ defmodule Mdpub.PageLayout do
 
       // Code block copy buttons
       document.querySelectorAll('pre').forEach(function(pre) {
-        var code = pre.querySelector('code');
+        const code = pre.querySelector('code');
         if (!code) return;
 
         // Skip mermaid diagrams - they are rendered by Mermaid.js
         if (code.classList.contains('mermaid')) return;
 
         // Wrap in container
-        var wrapper = document.createElement('div');
+        const wrapper = document.createElement('div');
         wrapper.className = 'code-block';
         pre.parentNode.insertBefore(wrapper, pre);
         wrapper.appendChild(pre);
 
         // Add copy button
-        var button = document.createElement('button');
+        const button = document.createElement('button');
         button.className = 'code-block__copy';
         button.type = 'button';
         button.title = 'Copy code';
@@ -430,7 +430,7 @@ defmodule Mdpub.PageLayout do
         button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
 
         button.addEventListener('click', function() {
-          var text = code.textContent;
+          const text = code.textContent;
           navigator.clipboard.writeText(text).then(function() {
             button.classList.add('code-block__copy--copied');
             button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
@@ -446,12 +446,12 @@ defmodule Mdpub.PageLayout do
         wrapper.appendChild(button);
 
         // Add language label if present
-        var langClass = Array.from(code.classList).find(function(c) {
+        const langClass = Array.from(code.classList).find(function(c) {
           return c.startsWith('language-');
         });
         if (langClass) {
-          var lang = langClass.replace('language-', '');
-          var label = document.createElement('span');
+          const lang = langClass.replace('language-', '');
+          const label = document.createElement('span');
           label.className = 'code-block__lang';
           label.textContent = lang;
           wrapper.appendChild(label);
