@@ -30,7 +30,8 @@ defmodule Mdpub.MixProject do
       {:jason, "~> 1.4"},
       {:earmark, "~> 1.4"},
       {:file_system, "~> 1.1"},
-      {:yaml_elixir, "~> 2.11"}
+      {:yaml_elixir, "~> 2.11"},
+      {:lazy_html, ">= 0.1.0", only: :test}
     ]
   end
 

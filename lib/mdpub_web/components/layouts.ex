@@ -18,10 +18,10 @@ defmodule MdpubWeb.Layouts do
   def flash_group(assigns) do
     ~H"""
     <div :if={msg = Phoenix.Flash.get(@flash, :info)} class="callout callout--info" role="alert">
-      <div class="callout__content"><%= msg %></div>
+      <div class="callout__content">{msg}</div>
     </div>
     <div :if={msg = Phoenix.Flash.get(@flash, :error)} class="callout callout--danger" role="alert">
-      <div class="callout__content"><%= msg %></div>
+      <div class="callout__content">{msg}</div>
     </div>
     """
   end
