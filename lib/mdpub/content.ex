@@ -140,7 +140,7 @@ defmodule Mdpub.Content do
       Earmark.Options.make_options!(
         smartypants: false,
         code_class_prefix: "language-",
-        postprocessor: &mermaid_postprocessor/1
+        postprocessor: &postprocessor/1
       )
 
     # Earmark returns {:ok, html, warnings}
@@ -150,7 +150,16 @@ defmodule Mdpub.Content do
     end
   end
 
-  defp mermaid_postprocessor({"pre", pre_attrs, [{"code", code_attrs, code_content, code_meta}], meta}) do
+  # Combined postprocessor that handles multiple transformations
+  defp postprocessor(node) do
+    node
+    |> mermaid_postprocessor()
+    |> task_list_postprocessor()
+  end
+
+  defp mermaid_postprocessor(
+         {"pre", pre_attrs, [{"code", code_attrs, code_content, code_meta}], meta}
+       ) do
     if mermaid_code_block?(code_attrs) do
       # Earmark adds `language-mermaid` class (via code_class_prefix option).
       # Mermaid.js queries for `.mermaid` nodes, so we add that class explicitly.
@@ -166,6 +175,76 @@ defmodule Mdpub.Content do
   end
 
   defp mermaid_postprocessor(node), do: node
+
+  # Task list postprocessor: converts GitHub-style task list items to checkboxes
+  # Handles: - [ ] unchecked and - [x] or - [X] checked items
+  #
+  # Note: We use {:replace, node} to replace the entire node including children.
+  # Returning just {tag, attrs, children, meta} would cause Earmark to ignore
+  # the children and descend into the original content.
+  defp task_list_postprocessor({"li", attrs, [first_child | rest], meta} = node)
+       when is_binary(first_child) do
+    case parse_task_item(first_child) do
+      {:task, checked, remaining_text} ->
+        checkbox = build_checkbox(checked)
+        new_children = [checkbox, remaining_text | rest]
+        attrs = ensure_class(attrs, "task-list-item")
+        {:replace, {"li", attrs, new_children, meta}}
+
+      :not_task ->
+        node
+    end
+  end
+
+  # Handle li with nested elements (e.g., paragraph inside li in loose lists)
+  defp task_list_postprocessor(
+         {"li", attrs, [{"p", p_attrs, [first_child | p_rest], p_meta} | rest], meta}
+       )
+       when is_binary(first_child) do
+    case parse_task_item(first_child) do
+      {:task, checked, remaining_text} ->
+        checkbox = build_checkbox(checked)
+        new_p_children = [checkbox, remaining_text | p_rest]
+        new_children = [{"p", p_attrs, new_p_children, p_meta} | rest]
+        attrs = ensure_class(attrs, "task-list-item")
+        {:replace, {"li", attrs, new_children, meta}}
+
+      :not_task ->
+        {"li", attrs, [{"p", p_attrs, [first_child | p_rest], p_meta} | rest], meta}
+    end
+  end
+
+  defp task_list_postprocessor(node), do: node
+
+  # Parse task item markers: [ ], [x], [X]
+  defp parse_task_item(text) when is_binary(text) do
+    cond do
+      String.starts_with?(text, "[ ] ") ->
+        {:task, false, String.slice(text, 4..-1//1)}
+
+      String.starts_with?(text, "[x] ") or String.starts_with?(text, "[X] ") ->
+        {:task, true, String.slice(text, 4..-1//1)}
+
+      # Handle case without trailing space (end of line)
+      text == "[ ]" ->
+        {:task, false, ""}
+
+      text in ["[x]", "[X]"] ->
+        {:task, true, ""}
+
+      true ->
+        :not_task
+    end
+  end
+
+  # Build checkbox HTML tuple for the AST
+  defp build_checkbox(checked) do
+    attrs =
+      [{"type", "checkbox"}, {"disabled", "disabled"}] ++
+        if(checked, do: [{"checked", "checked"}], else: [])
+
+    {"input", attrs, [], %{}}
+  end
 
   defp mermaid_code_block?(attrs) do
     case List.keyfind(attrs, "class", 0) do
