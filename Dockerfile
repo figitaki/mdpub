@@ -19,10 +19,14 @@ COPY mix.exs mix.lock ./
 RUN mix deps.get --only prod
 RUN mix deps.compile
 
+COPY config ./config
 COPY lib ./lib
 COPY priv ./priv
+COPY assets ./assets
 COPY content ./content
 
+# Build assets and compile
+RUN mix assets.deploy
 RUN mix compile
 RUN mix release
 
@@ -46,5 +50,4 @@ COPY --from=build /app/content ./content
 
 EXPOSE 4000
 
-# "start" runs in the foreground; "daemon" would background itself.
 CMD ["/app/bin/mdpub", "start"]

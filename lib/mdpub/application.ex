@@ -5,15 +5,32 @@ defmodule Mdpub.Application do
 
   @impl true
   def start(_type, _args) do
-    port = (System.get_env("PORT") || "4000") |> String.to_integer()
-
-    children = [
-      # Mdpub.Content owns the ETS cache and (optionally) starts the file watcher.
-      {Mdpub.Content, []},
-      {Bandit, plug: Mdpub.Web, scheme: :http, port: port}
-    ]
+    children =
+      [
+        {Phoenix.PubSub, name: Mdpub.PubSub},
+        Mdpub.Content,
+        Mdpub.Nav
+      ] ++
+        maybe_watcher() ++
+        [
+          MdpubWeb.Endpoint
+        ]
 
     opts = [strategy: :one_for_one, name: Mdpub.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  @impl true
+  def config_change(changed, _new, removed) do
+    MdpubWeb.Endpoint.config_change(changed, removed)
+    :ok
+  end
+
+  defp maybe_watcher do
+    if Mdpub.Content.watcher?() do
+      [Mdpub.ContentWatcher]
+    else
+      []
+    end
   end
 end

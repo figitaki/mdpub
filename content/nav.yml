@@ -1,0 +1,28 @@
+# Navigation configuration for mdpub
+#
+# nav:       Top-level header links
+# doc_order: Ordered list of pages for prev/next navigation
+
+nav:
+  - label: Home
+    href: /
+  - label: Getting Started
+    href: /getting-started
+  - label: Docs
+    href: /docs/routing
+  - label: Mermaid
+    href: /mermaid
+
+doc_order:
+  - path: index
+    title: Home
+    href: /
+  - path: getting-started
+    title: Getting Started
+    href: /getting-started
+  - path: docs/routing
+    title: Routing
+    href: /docs/routing
+  - path: mermaid
+    title: Mermaid
+    href: /mermaid

@@ -1,0 +1,59 @@
+<div id="content-page" phx-hook="ContentPage">
+  <%!-- Breadcrumb navigation --%>
+  <nav
+    :if={@breadcrumb && length(@breadcrumb) > 1}
+    class="breadcrumb"
+    aria-label="Breadcrumb"
+  >
+    <%= for {item, idx} <- Enum.with_index(@breadcrumb) do %>
+      <%= if idx == length(@breadcrumb) - 1 do %>
+        <span class="breadcrumb__current"><%= item.label %></span>
+      <% else %>
+        <.link navigate={item.href} class="breadcrumb__link"><%= item.label %></.link>
+        <span class="breadcrumb__separator" aria-hidden="true">/</span>
+      <% end %>
+    <% end %>
+  </nav>
+
+  <%!-- Page content --%>
+  <%= if @error == :not_found do %>
+    <article class="prose">
+      <h1>Page not found</h1>
+      <p>We couldn't find a document at <code><%= "/" <> Enum.join(@path_segments, "/") %></code>.</p>
+      <p><.link navigate="/">Return to home</.link></p>
+    </article>
+  <% end %>
+
+  <%= if match?({:render_error, _}, @error) do %>
+    <article class="prose">
+      <h1>Something went wrong</h1>
+      <p>There was a problem rendering this page.</p>
+      <pre><code><%= inspect(elem(@error, 1)) %></code></pre>
+      <p><.link navigate="/">Return to home</.link></p>
+    </article>
+  <% end %>
+
+  <%= if @page do %>
+    <article class="prose">
+      <%= Phoenix.HTML.raw(@page.body_html) %>
+    </article>
+  <% end %>
+
+  <%!-- Prev/Next document navigation --%>
+  <%= if @doc_nav && (@doc_nav.prev || @doc_nav.next) do %>
+    <nav class="doc-nav" aria-label="Document navigation">
+      <%= if @doc_nav.prev do %>
+        <.link navigate={@doc_nav.prev.href} class="doc-nav__link doc-nav__link--prev">
+          <span class="doc-nav__label">Previous</span>
+          <span class="doc-nav__title"><%= @doc_nav.prev.title %></span>
+        </.link>
+      <% end %>
+      <%= if @doc_nav.next do %>
+        <.link navigate={@doc_nav.next.href} class="doc-nav__link doc-nav__link--next">
+          <span class="doc-nav__label">Next</span>
+          <span class="doc-nav__title"><%= @doc_nav.next.title %></span>
+        </.link>
+      <% end %>
+    </nav>
+  <% end %>
+</div>
