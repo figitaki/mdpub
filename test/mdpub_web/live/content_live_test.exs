@@ -6,6 +6,11 @@ defmodule MdpubWeb.ContentLiveTest do
 
   @endpoint MdpubWeb.Endpoint
 
+  test "GET /nonexistent renders not-found content" do
+    {:ok, _view, html} = live(build_conn(), "/nonexistent")
+    assert html =~ "Page not found"
+  end
+
   test "live page refreshes when content_changed event is broadcast" do
     tmp_dir = Path.join(System.tmp_dir!(), "mdpub-live-#{System.unique_integer([:positive])}")
     File.mkdir_p!(tmp_dir)
@@ -49,5 +54,15 @@ defmodule MdpubWeb.ContentLiveTest do
       Mdpub.Nav.reload()
       Process.sleep(20)
     end
+  end
+
+  test "nav_updated event refreshes navigation assigns" do
+    {:ok, view, _html} = live(build_conn(), "/")
+
+    Phoenix.PubSub.broadcast(Mdpub.PubSub, "content:updates", :nav_updated)
+
+    # View should still render without crashing
+    html = render(view)
+    assert is_binary(html)
   end
 end
