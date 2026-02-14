@@ -1151,7 +1151,198 @@ a:focus-visible {
 }
 
 /* ==========================================================================
-   18. Responsive Design
+   18. Standups-Specific Components
+   ========================================================================== */
+
+/* Latest standup card - highlight as primary action */
+.standup-latest {
+  margin: var(--space-8) 0;
+  padding: var(--space-6);
+  background: linear-gradient(135deg, var(--color-accent-subtle) 0%, var(--color-surface) 100%);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.standup-latest:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px -4px rgb(0 0 0 / 0.2);
+}
+
+.standup-latest__title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.standup-latest__link {
+  display: block;
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--color-accent);
+  text-decoration: none;
+  margin-bottom: var(--space-2);
+}
+
+.standup-latest__link:hover {
+  color: var(--color-link-hover);
+}
+
+.standup-latest__timestamp {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.standup-latest__timestamp::before {
+  content: "🕒";
+}
+
+/* Agent list - full-width tappable rows */
+.agent-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-6) 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.agent-list__item {
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.agent-list__item:last-child {
+  border-bottom: none;
+}
+
+.agent-list__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  text-decoration: none;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  transition: background-color var(--transition-fast), padding-left var(--transition-fast);
+}
+
+.agent-list__link:hover {
+  background-color: var(--color-surface);
+  padding-left: var(--space-6);
+}
+
+.agent-list__name {
+  font-weight: 500;
+  font-size: var(--text-base);
+}
+
+.agent-list__timestamp {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.agent-list__arrow {
+  color: var(--color-text-muted);
+  transition: transform var(--transition-fast), color var(--transition-fast);
+}
+
+.agent-list__link:hover .agent-list__arrow {
+  transform: translateX(4px);
+  color: var(--color-accent);
+}
+
+/* Recent standups list - compact with timestamps */
+.standup-recent-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-4) 0;
+}
+
+.standup-recent-list__item {
+  margin: 0;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.standup-recent-list__item:last-child {
+  border-bottom: none;
+}
+
+.standup-recent-list__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: var(--color-link);
+  transition: color var(--transition-fast), padding-left var(--transition-fast);
+}
+
+.standup-recent-list__link:hover {
+  color: var(--color-link-hover);
+  padding-left: var(--space-2);
+}
+
+.standup-recent-list__date {
+  font-weight: 500;
+}
+
+.standup-recent-list__time {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* Enhanced link hover states for prose content */
+.prose a:not(.btn):not(.agent-list__link):not(.standup-latest__link) {
+  position: relative;
+  text-decoration: underline;
+  text-decoration-color: var(--color-border-strong);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--transition-fast), color var(--transition-fast);
+}
+
+.prose a:not(.btn):not(.agent-list__link):not(.standup-latest__link):hover {
+  text-decoration-color: currentColor;
+}
+
+/* Reduce excessive spacing */
+.prose > *:first-child {
+  margin-top: 0;
+}
+
+.prose > h2:not(:first-child) {
+  margin-top: var(--space-10);
+}
+
+.prose > h3:not(:first-child) {
+  margin-top: var(--space-6);
+}
+
+/* Compact footer for standups */
+.footer--minimal {
+  padding: var(--space-4) 0;
+  background-color: var(--color-surface);
+}
+
+.footer--minimal .footer__text {
+  font-size: var(--text-xs);
+}
+
+.footer--minimal .footer__links {
+  display: none;
+}
+
+/* ==========================================================================
+   19. Responsive Design
    ========================================================================== */
 
 @media (max-width: 768px) {
@@ -1202,6 +1393,34 @@ a:focus-visible {
     flex-direction: column;
     text-align: center;
     gap: var(--space-2);
+  }
+
+  /* Standups mobile optimizations */
+  .standup-latest {
+    padding: var(--space-4);
+    margin: var(--space-6) 0;
+  }
+
+  .standup-latest__link {
+    font-size: var(--text-xl);
+  }
+
+  .agent-list__link {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .agent-list__link:hover {
+    padding-left: var(--space-5);
+  }
+
+  .standup-recent-list__link {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+
+  .standup-recent-list__time {
+    font-size: var(--text-xs);
   }
 }
 
