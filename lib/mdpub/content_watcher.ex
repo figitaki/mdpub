@@ -19,12 +19,20 @@ defmodule Mdpub.ContentWatcher do
   def init(_opts) do
     content_dir = Mdpub.Content.content_dir() |> Path.expand()
 
-    {:ok, pid} = FileSystem.start_link(dirs: [content_dir])
-    FileSystem.subscribe(pid)
+    case FileSystem.start_link(dirs: [content_dir]) do
+      {:ok, pid} ->
+        FileSystem.subscribe(pid)
+        Logger.info("mdpub: watching #{content_dir} for changes")
+        {:ok, %{content_dir: content_dir, fs: pid}}
 
-    Logger.info("mdpub: watching #{content_dir} for changes")
+      :ignore ->
+        Logger.warning("mdpub: file watcher not available (inotify-tools may be missing)")
+        :ignore
 
-    {:ok, %{content_dir: content_dir, fs: pid}}
+      {:error, reason} ->
+        Logger.error("mdpub: failed to start file watcher: #{inspect(reason)}")
+        :ignore
+    end
   end
 
   @impl true
