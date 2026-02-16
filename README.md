@@ -8,6 +8,7 @@ A simple Elixir-based docs/publishing framework: serve Markdown files from a dir
 - Nested routes and `index.md`
 - Minimal ETS cache (keyed by file mtime)
 - Optional file watching (invalidates cache on change)
+- Atom One Dark-inspired default theme (with light-mode toggle)
 - Single binary release (via `mix release`)
 
 ## Mermaid diagrams

@@ -94,7 +94,7 @@ Hooks.ContentPage = {
 function getPreferredTheme() {
   const saved = localStorage.getItem("theme")
   if (saved) return saved
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+  return "dark"
 }
 
 function setTheme(theme) {
@@ -105,12 +105,7 @@ function setTheme(theme) {
 // Initialize theme immediately
 setTheme(getPreferredTheme())
 
-// Listen for system preference changes
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-  if (!localStorage.getItem("theme")) {
-    setTheme(e.matches ? "dark" : "light")
-  }
-})
+// Default is fixed to dark (Atom One Dark-inspired) unless user toggles manually.
 
 // Initialize mermaid when its script loads
 const mermaidScript = document.querySelector('script[src*="mermaid"]')
