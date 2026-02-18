@@ -11,6 +11,7 @@ A Phoenix LiveView-based docs/publishing framework: serve Markdown files from a 
 - Nested routes and `index.md`
 - ETS-backed content cache (keyed by file mtime)
 - File watching with PubSub broadcasting
+- Atom One Dark-inspired default theme (with light-mode toggle)
 - Single binary release (via `mix release`)
 
 ## Mermaid diagrams
