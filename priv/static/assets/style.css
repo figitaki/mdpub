@@ -200,7 +200,9 @@
 
 /* ==========================================================================
    1b. Webfonts (Charter, MIT-licensed via charter-webfont; underlying
-       Bitstream Charter is freely redistributable per /assets/fonts/CHARTER_LICENSE.txt)
+       Bitstream Charter is freely redistributable per fonts/CHARTER_LICENSE.txt).
+       Paths below are CSS-relative so the stylesheet resolves correctly when
+       served under a base path (e.g. /standups-review/assets/style.css).
    ========================================================================== */
 
 @font-face {
@@ -209,7 +211,7 @@
   font-weight: 400;
   font-display: swap;
   src: local("Charter"), local("Bitstream Charter"),
-       url("/assets/fonts/charter_regular.woff2") format("woff2");
+       url("fonts/charter_regular.woff2") format("woff2");
 }
 
 @font-face {
@@ -218,7 +220,7 @@
   font-weight: 400;
   font-display: swap;
   src: local("Charter Italic"), local("Bitstream Charter Italic"),
-       url("/assets/fonts/charter_italic.woff2") format("woff2");
+       url("fonts/charter_italic.woff2") format("woff2");
 }
 
 @font-face {
@@ -227,7 +229,7 @@
   font-weight: 700;
   font-display: swap;
   src: local("Charter Bold"), local("Bitstream Charter Bold"),
-       url("/assets/fonts/charter_bold.woff2") format("woff2");
+       url("fonts/charter_bold.woff2") format("woff2");
 }
 
 @font-face {
@@ -236,7 +238,7 @@
   font-weight: 700;
   font-display: swap;
   src: local("Charter Bold Italic"), local("Bitstream Charter Bold Italic"),
-       url("/assets/fonts/charter_bold_italic.woff2") format("woff2");
+       url("fonts/charter_bold_italic.woff2") format("woff2");
 }
 
 /* ==========================================================================
