@@ -8,8 +8,17 @@
     <.live_title>
       <%= assigns[:page_title] || "mdpub" %> · mdpub
     </.live_title>
+    <link
+      rel="preload"
+      href={~p"/assets/fonts/charter_regular.woff2"}
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
     <link phx-track-static rel="stylesheet" href={~p"/assets/style.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+    </script>
+    <script defer src={~p"/assets/highlight.min.js"}>
     </script>
     <script defer src={~p"/assets/mermaid.min.js"}>
     </script>

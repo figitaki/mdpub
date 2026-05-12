@@ -38,6 +38,11 @@ Hooks.ContentPage = {
       // Skip mermaid diagrams
       if (code.classList.contains("mermaid")) return
 
+      // hljs picks up the language from the `language-*` class set by Earmark.
+      if (window.hljs) {
+        try { window.hljs.highlightElement(code) } catch (_e) {}
+      }
+
       // Wrap in container
       const wrapper = document.createElement("div")
       wrapper.className = "code-block"
