@@ -125,7 +125,8 @@ if (mermaidScript) {
 // -- LiveView socket --
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {
+let liveSocketPath = document.querySelector("meta[name='live-socket-path']")?.getAttribute("content") || "/live"
+let liveSocket = new LiveSocket(liveSocketPath, Socket, {
   params: {_csrf_token: csrfToken},
   hooks: Hooks,
   longPollFallbackMs: 2500
