@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <meta name="csrf-token" content={get_csrf_token()} />
+    <meta name="live-socket-path" content={~p"/live"} />
     <.live_title>
       <%= assigns[:page_title] || "mdpub" %> · mdpub
     </.live_title>
